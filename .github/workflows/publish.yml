@@ -1,5 +1,7 @@
-# Publishes to npm when a GitHub release is published. npm trusts this workflow directly (trusted publishing), so
-# there's no token to store, and the package gets a provenance statement linking it to the commit it was built from.
+# Stages a new version on npm when a GitHub release is published. npm trusts this workflow directly (trusted
+# publishing), so there's no token to store, and the package gets a provenance statement linking it to the commit it
+# was built from. Nothing goes live until a maintainer approves the staged version with their passkey on npmjs.com or
+# with `npm stage approve`.
 name: Publish
 
 on:
@@ -21,6 +23,8 @@ jobs:
           registry-url: https://registry.npmjs.org
       - name: Check the release tag matches package.json
         run: test "${GITHUB_REF_NAME}" = "v$(node -p 'require("./package.json").version')"
+      # Staged publishing needs npm 12.
+      - run: npm install --global npm@12
       - run: npm ci
       # prepublishOnly type-checks, lints, tests and builds before anything is uploaded.
-      - run: npm publish
+      - run: npm stage publish
