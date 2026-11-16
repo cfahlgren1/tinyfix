@@ -1,6 +1,6 @@
 {
   "name": "tinyfix",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Autocorrect that reads both sides of a word. A 2 MB model that runs in the browser and fixes “form” when you meant “from”.",
   "keywords": [
     "autocorrect",

@@ -21,7 +21,7 @@ await tinyfix.fix("I got a letter form the bank and did not recieve it.");
   <img src=".github/what-it-does.png" alt="You type: I got a letter form the bank. Their is a problem, and I am to tired to recieve it. You get: I got a letter from the bank. There is a problem, and I am too tired to receive it." width="880">
 </p>
 
-It's the autocorrect in [offlinepage.app](https://offlinepage.app), a writing app that works in airplane mode.
+**[Try it in your browser](https://huggingface.co/spaces/paperweight/tinyfix).** It's also the autocorrect in [offlinepage.app](https://offlinepage.app), a writing app that works in airplane mode.
 
 ## Getting the fixes
 
@@ -116,7 +116,7 @@ To serve them from your own site, copy the four files from the [model repo](http
 const tinyfix = await loadTinyfix({ baseUrl: "/models/" });
 ```
 
-The model runs on [ONNX Runtime Web](https://onnxruntime.ai/docs/tutorials/web/), which is installed with this package. On a page it runs in ONNX Runtime's own worker, so loading it doesn't freeze typing.
+The model runs on [ONNX Runtime Web](https://onnxruntime.ai/docs/tutorials/web/), which is installed with this package. On a page it runs in tinyfix's own worker, so loading it and checking words don't freeze typing. Vite and webpack give the worker a file of its own with no setup. With a bundler that doesn't, the model runs on the page instead, which works the same but can pause typing briefly while it loads.
 
 ## Where it runs
 
@@ -129,6 +129,8 @@ npm test         # downloads the model files once, then runs the tests
 npm run check    # types
 npm run lint
 ```
+
+The [demo page](https://huggingface.co/spaces/paperweight/tinyfix) is in [`demo/`](demo), and runs on this repo's build of the package.
 
 ## License
 

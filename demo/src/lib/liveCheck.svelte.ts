@@ -1,4 +1,4 @@
-import type { Fix, Tinyfix } from "tinyfix";
+import { loadTinyfix, type Fix, type Tinyfix } from "tinyfix";
 import { finishedLength } from "./segments";
 
 /**
@@ -18,8 +18,6 @@ export class LiveCheck {
 
   async load(): Promise<void> {
     try {
-      // Loaded as its own chunk: ONNX Runtime starts its worker from the script it's in, which mustn't be the page's.
-      const { loadTinyfix } = await import("tinyfix");
       this.#tinyfix = await loadTinyfix();
       this.status = "ready";
       await this.#catchUp();

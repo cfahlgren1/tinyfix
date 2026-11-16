@@ -1,5 +1,6 @@
-import * as ort from "onnxruntime-web";
 import { Fixer, WITH_MODEL_WEIGHTS, parseWordList } from "./engine/fixer.js";
+import { createModel, type Model } from "./engine/model.js";
+import { loadModelInWorker } from "./engine/modelInWorker.js";
 import { WordTrie } from "./engine/trie.js";
 import { CAREFUL_WRONG_WORD, EAGER_WRONG_WORD, WrongWordChecker } from "./engine/wrongWord.js";
 
@@ -117,6 +118,21 @@ function apply(text: string, fixes: readonly Fix[]): string {
 }
 
 /**
+ * On a page, the model runs in tinyfix's own worker, so starting it and checking words never block typing. Elsewhere,
+ * or if the worker can't start, it runs right here.
+ */
+async function startModel(bytes: ArrayBuffer, wasmPaths: string | undefined): Promise<Model> {
+  const runHere = async (modelBytes: ArrayBuffer) => {
+    // The WebAssembly-only build of ONNX Runtime. The default build also carries WebGPU, which tinyfix doesn't use.
+    const ort = await import("onnxruntime-web/wasm");
+    return createModel(ort, modelBytes, wasmPaths);
+  };
+  if (typeof document === "undefined" || typeof Worker === "undefined") return runHere(bytes);
+  // The worker is handed a copy, so the bytes are still here if it can't start.
+  return loadModelInWorker(bytes.slice(0), wasmPaths).catch(() => runHere(bytes));
+}
+
+/**
  * Loads tinyfix: about 3.5 MB of model and word lists, from Hugging Face unless `baseUrl` says otherwise. Call it
  * once and keep the result.
  */
@@ -136,20 +152,14 @@ export async function loadTinyfix(options: LoadOptions = {}): Promise<Tinyfix> {
       : null,
   ]);
 
-  let session: ort.InferenceSession | null = null;
+  let model: Model | null = null;
   let wrongWord: WrongWordChecker | null = null;
   if (modelFiles) {
-    const [model, vocabulary, confusions] = modelFiles;
-    // One thread, so a page needs no cross-origin isolation headers.
-    ort.env.wasm.numThreads = 1;
-    if (options.wasmPaths) ort.env.wasm.wasmPaths = options.wasmPaths;
-    // On a page, ONNX Runtime runs the model in its own worker, so starting it doesn't block typing.
-    if (typeof document !== "undefined") ort.env.wasm.proxy = true;
-    session = await ort.InferenceSession.create(new Uint8Array(model), { executionProviders: ["wasm"] });
+    const [bytes, vocabulary, confusions] = modelFiles;
+    model = await startModel(bytes, options.wasmPaths);
     await nextTask();
     wrongWord = new WrongWordChecker({
-      ort,
-      session,
+      model,
       vocabulary: lines(vocabulary),
       confusions: lines(confusions),
       settings: options.mode === "careful" ? CAREFUL_WRONG_WORD : EAGER_WRONG_WORD,
@@ -222,7 +232,7 @@ export async function loadTinyfix(options: LoadOptions = {}): Promise<Tinyfix> {
     fix: async (text, checkOptions) => apply(text, await check(text, checkOptions)),
     ignore: (word) => fixer.rememberUndo(word),
     dispose: async () => {
-      await session?.release();
+      await model?.release();
     },
   };
 }

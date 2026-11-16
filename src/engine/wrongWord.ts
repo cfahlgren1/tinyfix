@@ -1,4 +1,4 @@
-import type * as Ort from "onnxruntime-web";
+import type { Model } from "./model.js";
 import type { ContextScorer, Correction } from "./fixer.js";
 import { isCheckable, isSentenceStart, matchCase } from "./rules.js";
 import { WordTrie } from "./trie.js";
@@ -33,8 +33,7 @@ const WORD = /^[a-z]+(?:'[a-z]+)?$/;
 const LISTED_WORD = /^[A-Za-z]+(?:'[A-Za-z]+)?$/;
 
 export interface WrongWordOptions {
-  ort: typeof Ort;
-  session: Ort.InferenceSession;
+  model: Model;
   /** Lines of the model's vocab.txt, most common word first. */
   vocabulary: readonly string[];
   /** Lines of the model's confusions.txt: a typed word, then words people meant by it. */
@@ -204,9 +203,11 @@ export class WrongWordChecker implements WrongWordFinder, ContextScorer {
       RIGHT_WINDOW,
     );
     const tiled = (values: readonly number[]) => rows.flatMap(() => values);
-    const tensor = (values: readonly number[], width: number) =>
-      new this.options.ort.Tensor("int64", BigInt64Array.from(values, BigInt), [rows.length, width]);
-    const output = await this.options.session.run({
+    const tensor = (values: readonly number[], width: number) => ({
+      data: BigInt64Array.from(values, BigInt),
+      dims: [rows.length, width] as [number, number],
+    });
+    return this.options.model.run({
       left: tensor(tiled(left), LEFT_WINDOW),
       right: tensor(tiled(right), RIGHT_WINDOW),
       candidates: tensor(
@@ -214,7 +215,6 @@ export class WrongWordChecker implements WrongWordFinder, ContextScorer {
         CANDIDATES,
       ),
     });
-    return output.scores!.data as Float32Array;
   }
 
   /** Short words and words with an apostrophe are left to the list of known mix-ups ("to" and "too", "it's" and "its"). */

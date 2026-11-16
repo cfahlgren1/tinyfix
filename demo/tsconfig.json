@@ -11,7 +11,7 @@
     "skipLibCheck": true,
     "isolatedModules": true,
     "verbatimModuleSyntax": true,
-    "paths": { "tinyfix": ["../src/index.ts"] }
+    "paths": { "tinyfix": ["../dist/index.d.ts"] }
   },
   "include": ["src", "vite.config.ts"]
 }

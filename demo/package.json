@@ -4,13 +4,14 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "npm run check && vite build",
+    "dev": "npm run package && vite",
+    "build": "npm run package && npm run check && vite build",
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "format": "prettier --write \"src/**/*.{ts,svelte,css}\" index.html",
     "format:check": "prettier --check \"src/**/*.{ts,svelte,css}\" index.html",
-    "deploy": "bash scripts/deploy-space.sh"
+    "deploy": "bash scripts/deploy-space.sh",
+    "package": "npm --prefix .. run build"
   },
   "dependencies": {
     "@fontsource-variable/newsreader": "^5.3.0"
