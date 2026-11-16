@@ -1,0 +1,54 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "unicorn", "oxc", "import", "promise"],
+  "categories": {
+    "correctness": "error",
+    "suspicious": "error",
+    "perf": "error"
+  },
+  "env": {
+    "browser": true,
+    "node": true,
+    "es2024": true
+  },
+  "ignorePatterns": ["dist", ".models"],
+  "rules": {
+    "no-unused-vars": "error",
+    "eqeqeq": "error",
+    "no-console": [
+      "error",
+      {
+        "allow": ["error"]
+      }
+    ],
+    "typescript/no-explicit-any": "error",
+    "typescript/consistent-type-imports": "error",
+    "typescript/no-non-null-assertion": "off",
+    "import/no-cycle": "error",
+    "unicorn/no-array-sort": "off",
+    "unicorn/no-array-reverse": "off",
+    "no-await-in-loop": "off",
+    "no-control-regex": "off",
+    "no-underscore-dangle": "off",
+    "unicorn/no-new-array": "off",
+    "unicorn/require-post-message-target-origin": "off",
+    "import/no-named-as-default": "off",
+    "import/no-unassigned-import": [
+      "error",
+      {
+        "allow": ["**/*.css"]
+      }
+    ],
+    "oxc/no-map-spread": "off",
+    "unicorn/prefer-add-event-listener": "off",
+    "promise/always-return": "off"
+  },
+  "overrides": [
+    {
+      "files": ["scripts/**", "test/**"],
+      "rules": {
+        "no-console": "off"
+      }
+    }
+  ]
+}
