@@ -1,0 +1,108 @@
+@import "tailwindcss";
+
+/* Colors are CSS variables that swap for dark mode, so utilities like `text-sub` follow the system theme. */
+:root {
+  --paper: #f4f3ef;
+  --body: #2a2a2c;
+  --ink: #121214;
+  --sub: #66666b;
+  --faint: #828287;
+  --line: #dedcd6;
+  --chip: #ebe9e3;
+  --context: #8e2de2;
+  --context-line: rgb(142 45 226 / 0.6);
+  --context-flash: rgb(142 45 226 / 0.16);
+  --spelling: #0066cc;
+  --spelling-line: rgb(0 102 204 / 0.45);
+  --spelling-flash: rgb(0 102 204 / 0.14);
+  --squiggle: rgb(215 0 21 / 0.5);
+  --dither: #3a3a3c;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #131312;
+    --body: #e6e4df;
+    --ink: #f5f5f7;
+    --sub: #a3a19c;
+    --faint: #8a8884;
+    --line: #2e2d2a;
+    --chip: #1f1e1c;
+    --context: #bf7bff;
+    --context-line: rgb(191 123 255 / 0.65);
+    --context-flash: rgb(191 123 255 / 0.2);
+    --spelling: #5eb0ff;
+    --spelling-line: rgb(94 176 255 / 0.55);
+    --spelling-flash: rgb(94 176 255 / 0.18);
+    --squiggle: rgb(255 92 92 / 0.6);
+    --dither: #6b6964;
+    color-scheme: dark;
+  }
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-body: var(--body);
+  --color-ink: var(--ink);
+  --color-sub: var(--sub);
+  --color-faint: var(--faint);
+  --color-line: var(--line);
+  --color-chip: var(--chip);
+  --color-context: var(--context);
+  --color-context-line: var(--context-line);
+  --color-spelling: var(--spelling);
+  --color-spelling-line: var(--spelling-line);
+  --color-squiggle: var(--squiggle);
+  --color-dither: var(--dither);
+}
+
+@theme {
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", "Segoe UI", Arial, sans-serif;
+  --font-serif: "Iowan Old Style", "Charter", "Newsreader", Georgia, serif;
+  --font-mono: "SF Mono", ui-monospace, Menlo, Consolas, monospace;
+
+  /* A fix lands: its underline draws in from the left while the word glows and fades back. */
+  --animate-land: draw 0.32s cubic-bezier(0.2, 0.8, 0.2, 1) both, glow 0.9s ease-out both;
+  /* The squiggle under what was typed fades in as the fix lands below it. */
+  --animate-squiggle: squiggle 0.35s ease-out both;
+
+  @keyframes draw {
+    from {
+      background-size: 0% 3px;
+    }
+  }
+  @keyframes glow {
+    from {
+      background-color: var(--flash);
+    }
+  }
+  @keyframes squiggle {
+    from {
+      text-decoration-color: transparent;
+    }
+  }
+}
+
+/* The serif for systems without Iowan Old Style or Charter. */
+@font-face {
+  font-family: "Newsreader";
+  font-style: normal;
+  font-weight: 200 800;
+  font-display: swap;
+  src: url("@fontsource-variable/newsreader/files/newsreader-latin-opsz-normal.woff2") format("woff2");
+}
+
+@layer base {
+  body {
+    @apply bg-paper font-sans text-body antialiased;
+  }
+
+  button {
+    @apply cursor-pointer;
+  }
+
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-context;
+  }
+}

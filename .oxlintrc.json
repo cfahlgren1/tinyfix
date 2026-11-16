@@ -11,7 +11,7 @@
     "node": true,
     "es2024": true
   },
-  "ignorePatterns": ["dist", ".models"],
+  "ignorePatterns": ["dist", ".models", "demo/node_modules", "demo/dist"],
   "rules": {
     "no-unused-vars": "error",
     "eqeqeq": "error",
