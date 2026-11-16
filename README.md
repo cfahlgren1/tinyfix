@@ -91,7 +91,7 @@ When someone undoes a fix, call `tinyfix.ignore(fix.original)` so it doesn't com
   <tr>
     <td align="center" width="33%"><h3>94%</h3>of its fixes are right</td>
     <td align="center" width="33%"><h3>40%</h3>of wrong words fixed</td>
-    <td align="center" width="33%"><h3>under 1 ms</h3>per word</td>
+    <td align="center" width="33%"><h3>~3 ms</h3>per check in Chrome</td>
   </tr>
 </table>
 
